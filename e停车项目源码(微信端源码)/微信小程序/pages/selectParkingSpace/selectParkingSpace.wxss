@@ -1,0 +1,31 @@
+map{
+width: 900rpx;
+height: 500rpx;
+}
+.pV{
+    
+    width: 100; 
+    height: 300px;
+}
+
+.choose{
+    
+    width: 500rpx; 
+    height: 100rpx;
+    
+}
+
+.no{
+  color: red;
+}
+
+.bk{
+  color: white;
+   background: linear-gradient(to right ,rgb(161, 166, 168),rgb(61, 63, 63));
+}
+
+.bottom {
+  width: 100%;
+  position: fixed;
+  bottom: 0rpx;
+}

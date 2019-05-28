@@ -1,0 +1,8 @@
+<!--pages/becomeVip/becomeVip.wxml-->
+<view>
+<view>这里模拟支付</view>
+<button bindtap='vip'>支付</button>
+<button bindtap='exit'>退出</button>
+</view>
+
+

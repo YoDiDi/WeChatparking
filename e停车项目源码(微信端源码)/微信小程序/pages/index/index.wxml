@@ -1,0 +1,31 @@
+<!--index.wxml-->
+<view class='memberBasicInfo'>
+  <view class="userinfo">
+    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
+    <block wx:else class="inline">
+      <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
+      <text class="userinfo-nickname">{{userInfo.nickName}}</text>
+      <text wx:if="{{VIP==1}}" class="userinfo-VIP">VIP会员</text>
+      <text wx:elif="{{VIP!=1}}" class="userinfo-NOVIP">普通会员</text>
+      <image wx:if="{{VIP==1}}" class='vip' src="{{vipImg}}" bindtap='become'></image>
+      <image wx:elif="{{VIP!=1}}" class='vip' src="{{novipImg}}" bindtap='become'></image>
+    </block>
+  </view>
+</view>
+
+<view class='carAndInformation' bindtap='changeInformation'>
+  <view class='car'>
+    <image src='../../img/car.png'></image>
+  </view>
+  <view class="information">
+    <view>车主姓名：{{userName}}</view>
+    <view>我的车牌：{{carID}}</view>
+    <view>账户余额：{{money}}</view>
+    <view>我的预定：{{position}}</view>
+  </view>
+</view>
+
+<view class='bottom'>
+  <button  bindtap='selectGarage'>预定停车场</button>
+  <button  bindtap='toGarage'>去预定停车场</button>
+</view>

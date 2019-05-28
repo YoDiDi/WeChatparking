@@ -1,0 +1,169 @@
+# coding: utf-8
+import tkinter as tk
+from tkinter.filedialog import *
+from tkinter import ttk
+import predict
+import cv2
+from PIL import Image, ImageTk
+import threading
+import time
+import pymysql
+import datetime
+
+class Surface(ttk.Frame):
+    pic_path = ""
+    viewhigh = 600
+    viewwide = 600
+    update_time = 0
+
+    thread = None
+    thread_run = False
+    camera = None
+    color_transform = {"green": ("绿牌", "#55FF55"), "yello": ("黄牌", "#FFFF00"), "blue": ("蓝牌", "#6666FF")}
+
+    def __init__(self, win):
+        ttk.Frame.__init__(self, win)
+        frame_left = ttk.Frame(self)
+        frame_right1 = ttk.Frame(self)
+        frame_right2 = ttk.Frame(self)
+        win.title("车牌识别")
+        win.state("normal")
+        self.pack(fill=tk.BOTH, expand=tk.YES, padx="5", pady="5")
+        frame_left.pack(side=LEFT, expand=1, fill=BOTH)
+        frame_right1.pack(side=TOP, expand=1, fill=tk.Y)
+        frame_right2.pack(side=RIGHT, expand=0)
+        ttk.Label(frame_left, text='原图：').pack(anchor="nw")
+        ttk.Label(frame_right1, text='车牌位置：').grid(column=0, row=0, sticky=tk.W)
+
+        self.image_ctl = ttk.Label(frame_left)
+        self.image_ctl.pack(anchor="nw")
+
+        self.roi_ctl = ttk.Label(frame_right1)
+        self.roi_ctl.grid(column=0, row=1, sticky=tk.W)
+        ttk.Label(frame_right1, text='识别结果：').grid(column=0, row=2, sticky=tk.W)
+        self.r_ctl = ttk.Label(frame_right1, text="")
+        self.r_ctl.grid(column=0, row=3, sticky=tk.W)
+        self.color_ctl = ttk.Label(frame_right1, text="", width="20")
+        self.color_ctl.grid(column=0, row=4, sticky=tk.W)
+        self.from_vedio()
+        self.predictor = predict.CardPredictor()
+        self.predictor.train_svm()
+
+
+    def get_imgtk(self, img_bgr):
+        img = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+        im = Image.fromarray(img)
+        imgtk = ImageTk.PhotoImage(image=im)
+        wide = imgtk.width()
+        high = imgtk.height()
+        if wide > self.viewwide or high > self.viewhigh:
+            wide_factor = self.viewwide / wide
+            high_factor = self.viewhigh / high
+            factor = min(wide_factor, high_factor)
+            wide = int(wide * factor)
+            if wide <= 0: wide = 1
+            high = int(high * factor)
+            if high <= 0: high = 1
+            im = im.resize((wide, high), Image.ANTIALIAS)
+            imgtk = ImageTk.PhotoImage(image=im)
+        return imgtk
+
+    def show_roi(self, r, roi, color):
+        if r:
+            roi = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
+            roi = Image.fromarray(roi)
+            self.imgtk_roi = ImageTk.PhotoImage(image=roi)
+            self.roi_ctl.configure(image=self.imgtk_roi, state='enable')
+            self.r_ctl.configure(text=str(r))
+            self.update_time = time.time()
+            try:
+                c = self.color_transform[color]
+                self.color_ctl.configure(text=c[0], background=c[1], state='enable')
+            except:
+                self.color_ctl.configure(state='disabled')
+        elif self.update_time + 8 < time.time():
+            self.roi_ctl.configure(state='disabled')
+            self.r_ctl.configure(text="")
+            self.color_ctl.configure(state='disabled')
+
+    def from_vedio(self):
+        if self.thread_run:
+            return
+        if self.camera is None:
+            self.camera = cv2.VideoCapture(0)
+            if not self.camera.isOpened():
+#                mBox.showwarning('警告', '摄像头打开失败！')
+                self.camera = None
+                return
+        self.thread = threading.Thread(target=self.vedio_thread, args=(self,))
+        self.thread.setDaemon(True)
+        self.thread.start()
+        self.thread_run = True
+
+    # def from_pic(self):
+    #     self.thread_run = False
+    #     self.pic_path = askopenfilename(title="选择识别图片", filetypes=[("jpg图片", "*.jpg")])
+    #     if self.pic_path:
+    #         img_bgr = predict.imreadex(self.pic_path)
+    #         self.imgtk = self.get_imgtk(img_bgr)
+    #         self.image_ctl.configure(image=self.imgtk)
+    #         r, roi, color = self.predictor.predict(img_bgr)
+    #         self.show_roi(r, roi, color)
+    #         if color != '':
+    #             ls3 = ''.join(r)
+    #             conn = pymysql.connect(host='localhost', user='root', password='123456', db='licenserecog', port=3306,
+    #                                    charset='utf8')  # 连接数据库
+    #             cursor = conn.cursor()  # 光标对象
+    #             sql = "insert into test(license,color,atime) VALUES (%s,%s,%s)"
+    #             dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    #             data = [ls3, color,dt]
+    #             cursor.execute(sql, data)  # 插入数据
+    #             cursor.connection.commit()
+    #         else :
+    #             return
+
+    @staticmethod
+    def vedio_thread(self):
+        self.thread_run = True
+        predict_time = time.time()
+        while self.thread_run:
+            _, img_bgr = self.camera.read()
+            self.imgtk = self.get_imgtk(img_bgr)
+            self.image_ctl.configure(image=self.imgtk)
+            if time.time() - predict_time > 2:
+                r, roi, color = self.predictor.predict(img_bgr)
+                self.show_roi(r, roi, color)
+                color = str(color)
+                color.replace(' ', '')
+                ls3 = ''.join(r)
+                if color != '' and color != NONE and color != 'None':
+                    conn = pymysql.connect(host='119.23.213.172', user='root', password='asdf1234', db='licenserecog', port=3306,
+                                           charset='utf8')  # 连接数据库
+                    cursor = conn.cursor()  # 光标对象
+                    sql = "insert into test(license,color,atime) VALUES (%s,%s,%s)"
+                    dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    data = [ls3, color, dt]
+                    cursor.execute(sql, data)  # 插入数据
+                    cursor.connection.commit()
+                elif color == 'None':
+                    print("❥❥❥❥❥❥❥❥❥❥❥")
+                predict_time = time.time()
+
+
+        print("run end")
+
+
+def close_window():
+    print("destroy")
+    if surface.thread_run:
+        surface.thread_run = False
+        surface.thread.join(2.0)
+    win.destroy()
+
+
+if __name__ == '__main__':
+    win = tk.Tk()
+    surface = Surface(win)
+    win.protocol('WM_DELETE_WINDOW', close_window)
+    win.mainloop()
+

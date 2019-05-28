@@ -1,0 +1,35 @@
+<view class='bk'>
+  <view>预定车位</view>
+  <view wx:if='{{isEmpty==1}}' class='no'>{{county}}-{{area}}区-{{num}}号--无车位</view>
+  <view wx:elif='{{isEmpty==0}}'>{{county}}-{{area}}区-{{num}}号--有车位</view>
+  <picker-view
+    indicator-style="height: 50px;"
+    style="width: 100%; height: 150px;"
+    value="{{value}}"
+    bindchange="bindChange"
+  >
+    <picker-view-column>
+      <view wx:for="{{countys}}" style="line-height: 50px" wx:key='id1'>{{item}}</view>
+    </picker-view-column>
+    <picker-view-column>
+      <view wx:for="{{areas}}" style="line-height: 50px" wx:key='id2'>{{item}}区</view>
+    </picker-view-column>
+    <picker-view-column>
+      <view wx:for="{{nums}}" style="line-height: 50px" wx:key='id3'>{{item}}号</view>
+    </picker-view-column>
+  </picker-view>
+ 
+</view>
+
+
+<button bindtap='booking' class='bk'>预定</button>
+
+<map latitude='{{latitude}}' longitude="{{longitude}}" markers='{{markers}}'></map>
+
+<view class='bottom'>
+<button bindtap='map' class='bk'>点击授权定位我的位置</button>
+
+<button bindtap='GO' class='bk'>去{{county}}停车场-{{area}}区-{{num}}号</button>
+<button bindtap='index' class='bk'>返回首页</button>
+</view>
+

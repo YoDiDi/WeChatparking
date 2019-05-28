@@ -1,0 +1,8 @@
+<!--pages/empower/empower.wxml-->
+<view class='all'>
+<view class='backcolor'>
+</view>
+<image bindtap='jump' class='emp' src='../../img/parking.png' ></image>
+<view class='re' >确认授权</view>
+
+</view>

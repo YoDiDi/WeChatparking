@@ -1,0 +1,109 @@
+/**index.wxss**/
+
+.userinfo {
+  /*display: flex;*/
+  flex-direction: column;
+  align-items: left;
+}
+
+.userinfo-avatar {
+  float: left;
+  width: 128rpx;
+  height: 128rpx;
+  margin: 20rpx;
+ border-radius: 128rpx;
+}
+
+.userinfo-nickname {
+  float: left;
+  padding-top: 65rpx;
+  color: wheat;
+}
+
+.userinfo-NOVIP {
+  float: left;
+  padding-left: 200rpx;
+  padding-top: 65rpx;
+  color: #000;
+}
+
+.userinfo-VIP {
+  float: left;
+  padding-left: 200rpx;
+  padding-top: 65rpx;
+  color: red;
+}
+
+.usermotto {
+  margin-top: 200px;
+}
+
+.memberBasicInfo {
+  width: 100%;
+  height: 100px; /**/
+  position: relative;
+  color: wheat;
+  background: linear-gradient(to right, rgb(161, 166, 168), rgb(44, 45, 46));
+}
+
+.inline {
+  display: inline;
+}
+
+.vip {
+  padding-top: 65rpx;
+  width: 100rpx;
+  height: 50rpx;
+}
+
+.carAndInformation {
+  margin-left: 2rpx;
+}
+
+.information {
+  position: absolute;
+  width: 97%;
+  height: 19%;
+  border-radius: 30rpx;
+  margin-top: 20rpx;
+  padding-left: 20rpx;
+  padding-top: 20rpx;
+  font-size: 40rpx;
+  color: wheat;
+  /* background-color: #ccc;*/
+  background: linear-gradient(to right, rgba(161, 166, 168, 0.9), rgba(44, 45, 46, 0.9));
+}
+
+.car {
+  position: absolute;
+  margin-top: 20rpx;
+  height: 10%;
+  /*width: 100%;*/
+}
+
+image {
+  padding-top: 20rpx;
+  padding-left: 20rpx;
+  height: 170%;
+}
+
+.informationButton {
+  position: fixed;
+  width: 100%;
+  bottom: 50rpx;
+}
+
+.nameBar {
+  background: linear-gradient(to right, rgb(45, 193, 255), rgb(70, 208, 254));
+}
+
+.bottom {
+  width: 100%;
+  position: fixed;
+  bottom: 0rpx;
+}
+
+button {
+  color: wheat;
+  background: linear-gradient(to right, rgb(161, 166, 168), rgb(44, 45, 46));
+}
